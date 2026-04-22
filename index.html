@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NaughtyDuk© - The Entertainment Industry's Digital Partner</title>
+
+<!-- google fonts - space mono looks sick for the mono stuff -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+
+/* css variables - changing these is way easier than hunting down hex codes everywhere */
+:root {
+  --bg: #080808;
+  --surface: #111111;
+  --border: #1e1e1e;
+  --accent: #e8ff00;   /* that yellow-green color */
+  --accent2: #ff3c00;
+  --text: #f0f0f0;
+  --muted: #666;
+  --mono: 'Space Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+  --body: 'DM Sans', sans-serif;
+}
+
+/* reset - got this from css-tricks */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: none; /* hiding default cursor for the custom one below */
+}
+
+/* custom cursor - took me forever to get the lag effect right lol */
+.cursor {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s ease;
+  mix-blend-mode: difference;
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transition: transform 0.15s ease, width 0.2s, height 0.2s;
+  mix-blend-mode: difference;
+  transform: translate(-11px, -11px);
+}
+
+/* grain texture overlay - makes it look less "digital" and more printed */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0.35;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 48px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+/* js adds this class on scroll */
+nav.scrolled {
+  background: rgba(8, 8, 8, 0.92);
+  backdrop-filter: blur(12px);
+  border-color: var(--border);
+}
+
+.nav-logo {
+  font-family: var(--display);
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+.nav-cta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+  padding: 10px 20px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.nav-cta:hover {
+  background: var(--accent2);
+  color: #fff;
+}
+
+/* HERO SECTION */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* scrolling grid in the background */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(232,255,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,255,0,0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: gridScroll 20s linear infinite;
+}
+
+@keyframes gridScroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(80px); }
+}
+
+/* the big faded DUK text behind everything */
+.hero-duk {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  font-size: 28vw;
+  opacity: 0.04;
+  font-family: var(--display);
+  letter-spacing: -10px;
+  user-select: none;
+  color: var(--accent);
+  animation: glitch 8s infinite;
+}
+
+/* glitch effect - this was painful to figure out but looks cool */
+@keyframes glitch {
+  0%, 94%, 100% {
+    transform: translateY(-50%) skewX(0);
+    opacity: 0.04;
+  }
+  95% {
+    transform: translateY(-50%) skewX(-5deg);
+    opacity: 0.07;
+    clip-path: inset(10% 0 80% 0);
+  }
+  96% {
+    transform: translateY(-50%) skewX(3deg) translateX(4px);
+    opacity: 0.05;
+  }
+  97% {
+    transform: translateY(-50%) skewX(0);
+    opacity: 0.04;
+  }
+}
+
+.hero-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.3s forwards;
+}
+
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(64px, 9vw, 140px);
+  line-height: 0.92;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  max-width: 900px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.5s forwards;
+}
+.hero-title .hl { color: var(--accent); }
+
+.hero-sub {
+  margin-top: 40px;
+  max-width: 500px;
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.7;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.7s forwards;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 40px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.9s forwards;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* buttons */
+.btn-primary {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 14px 28px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.1s;
+  display: inline-block;
+}
+.btn-primary:hover {
+  background: var(--accent2);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 14px 28px;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+  display: inline-block;
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* scroll indicator at bottom right */
+.hero-scroll {
+  position: absolute;
+  bottom: 32px;
+  right: 48px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeUp 1s 1.2s forwards;
+}
+
+.scroll-line {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  animation: scrollLine 2s 1.5s infinite;
+}
+@keyframes scrollLine {
+  0%   { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* reusable fade-up animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MARQUEE TICKER */
+.marquee-wrap {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  padding: 16px 0;
+  background: var(--surface);
+}
+
+.marquee-track {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 24s linear infinite;
+}
+
+.marquee-item {
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 48px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+.marquee-item span {
+  color: var(--accent);
+  font-size: 18px;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* general section styling */
+section {
+  padding: 120px 48px;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(42px, 5vw, 72px);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ABOUT */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-top: 64px;
+  align-items: start;
+}
+
+.about-left .big-stat {
+  font-family: var(--display);
+  font-size: clamp(80px, 10vw, 160px);
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -3px;
+}
+.about-left p {
+  font-size: 14px;
+  color: var(--muted);
+  font-family: var(--mono);
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.about-right p {
+  font-size: 18px;
+  color: #bbb;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+.about-right p strong { color: var(--text); }
+
+.services-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.service-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.service-tag:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* PROJECTS GRID */
+.projects { background: var(--bg); }
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 56px;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+/* 12 column grid layout */
+/* tried making this a flex but grid worked better */
+/* .project-grid { display: flex; flex-wrap: wrap; } */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px;
+}
+
+.project-card {
+  background: var(--surface);
+  overflow: hidden;
+  position: relative;
+  cursor: none;
+}
+
+/* card sizes - first one is big, rest are smaller */
+.project-card:nth-child(1) { grid-column: span 7; grid-row: span 2; }
+.project-card:nth-child(2) { grid-column: span 5; }
+.project-card:nth-child(3) { grid-column: span 5; }
+.project-card:nth-child(4) { grid-column: span 4; }
+.project-card:nth-child(5) { grid-column: span 4; }
+.project-card:nth-child(6) { grid-column: span 4; }
+
+.card-visual {
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  position: relative;
+}
+/* first card taller */
+.project-card:nth-child(1) .card-visual {
+  aspect-ratio: auto;
+  height: 400px;
+}
+
+.card-bg {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-size: 80px;
+  color: rgba(255,255,255,0.06);
+  letter-spacing: -2px;
+}
+.project-card:hover .card-bg { transform: scale(1.05); }
+
+/* each card has a slightly different bg color */
+.c1 { background: linear-gradient(135deg, #0d0d0d 0%, #1a0a00 100%); }
+.c2 { background: linear-gradient(135deg, #0a0a0d 0%, #00001a 100%); }
+.c3 { background: linear-gradient(135deg, #0d0a00 0%, #1a1200 100%); }
+.c4 { background: linear-gradient(135deg, #000d0a 0%, #001a10 100%); }
+.c5 { background: linear-gradient(135deg, #0d000a 0%, #1a0015 100%); }
+.c6 { background: linear-gradient(135deg, #050505 0%, #1a1a1a 100%); }
+
+.card-inner-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-icon-text {
+  font-family: var(--display);
+  font-size: clamp(40px, 5vw, 100px);
+  letter-spacing: -2px;
+  color: rgba(232,255,0,0.08);
+  transition: color 0.4s;
+}
+.project-card:hover .card-icon-text { color: rgba(232,255,0,0.15); }
+
+.card-info {
+  padding: 20px 24px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-name {
+  font-family: var(--display);
+  font-size: 22px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.card-type {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.card-arrow {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.project-card:hover .card-arrow {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.project-card:hover .card-arrow svg { stroke: var(--bg); }
+.card-arrow svg {
+  stroke: var(--muted);
+  transition: stroke 0.2s;
+}
+
+/* CAPABILITIES */
+.capabilities { background: var(--surface); }
+
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 64px;
+  border: 1px solid var(--border);
+}
+
+.cap-item {
+  padding: 40px 36px;
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.cap-item:hover { background: rgba(232,255,0,0.03); }
+.cap-item:last-child { border-right: none; }
+
+.cap-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+.cap-title {
+  font-family: var(--display);
+  font-size: 32px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+
+.cap-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+/* CLIENTS */
+.clients { background: var(--bg); }
+
+.client-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  transition: padding-left 0.3s;
+}
+/* subtle indent on hover */
+.client-row:hover { padding-left: 12px; }
+
+.client-name {
+  font-family: var(--display);
+  font-size: clamp(28px, 3vw, 48px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+.client-row:hover .client-name { color: var(--accent); }
+
+.client-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.client-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+}
+
+.client-years {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+/* CTA SECTION */
+.cta-section {
+  background: var(--accent);
+  padding: 120px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.cta-left .cta-title {
+  font-family: var(--display);
+  font-size: clamp(48px, 6vw, 96px);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--bg);
+  letter-spacing: -1px;
+}
+
+.cta-left p {
+  font-size: 16px;
+  color: rgba(0,0,0,0.6);
+  margin-top: 16px;
+  max-width: 400px;
+}
+
+.btn-dark {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--bg);
+  color: var(--accent);
+  padding: 16px 32px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+  display: inline-block;
+}
+.btn-dark:hover { background: #111; }
+
+/* FOOTER */
+footer {
+  background: #040404;
+  padding: 64px 48px 40px;
+  border-top: 1px solid var(--border);
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 64px;
+}
+
+.footer-logo {
+  font-family: var(--display);
+  font-size: 28px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.footer-logo span { color: var(--accent); }
+
+.footer-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 280px;
+}
+
+.footer-col h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 12px; }
+
+.footer-col a {
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--text); }
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-bottom p {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.footer-bottom a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.footer-bottom a:hover { color: var(--accent); }
+
+.footer-reg {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #333;
+  text-transform: uppercase;
+}
+
+/* MOBILE - TODO: properly test this on actual phones */
+@media (max-width: 900px) {
+  nav {
+    padding: 20px 24px;
+  }
+
+  /* hide nav links on mobile - need to add a hamburger menu later */
+  .nav-links { display: none; }
+
+  section { padding: 80px 24px; }
+  .hero { padding: 0 24px 64px; }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .cap-grid { grid-template-columns: 1fr; }
+  .cap-item {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* all project cards full width on mobile */
+  .project-card {
+    grid-column: span 12 !important;
+    grid-row: span 1 !important;
+  }
+  .project-card:nth-child(1) .card-visual { height: auto; }
+
+  .footer-top { grid-template-columns: 1fr 1fr; }
+  .cta-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hero-scroll { display: none; }
+}
+
+@media (max-width: 600px) {
+  .footer-top { grid-template-columns: 1fr; }
+  .services-list { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- cursor elements - positioned in JS -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVIGATION -->
+<nav id="nav">
+  <a href="#" class="nav-logo">NAUGHTY<span>DUK</span>©</a>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#capabilities">Services</a></li>
+    <li><a href="#clients">Clients</a></li>
+    <li><a href="#">Store</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get in touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-duk">DUK</div>
+
+  <p class="hero-tag">Manchester, UK · Est. 2022</p>
+
+  <h1 class="hero-title">
+    The Entertainment<br>
+    Industry's <span class="hl">Digital</span><br>
+    Partner.
+  </h1>
+
+  <p class="hero-sub">We design, develop and build digital systems for the entertainment industry — delivering immersive, performant experiences that slap.</p>
+
+  <div class="hero-actions">
+    <a href="#work" class="btn-primary">View Our Work</a>
+    <a href="#about" class="btn-ghost">About Us</a>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- scrolling text ticker -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <!-- duplicated so the loop looks seamless -->
+    <div class="marquee-item">Brands <span>✦</span></div>
+    <div class="marquee-item">Mobile Apps <span>✦</span></div>
+    <div class="marquee-item">Websites <span>✦</span></div>
+    <div class="marquee-item">Ticketing Systems <span>✦</span></div>
+    <div class="marquee-item">WebGL <span>✦</span></div>
+    <div class="marquee-item">Design <span>✦</span></div>
+    <div class="marquee-item">Infrastructure <span>✦</span></div>
+    <div class="marquee-item">Game Dev <span>✦</span></div>
+    <div class="marquee-item">Brands <span>✦</span></div>
+    <div class="marquee-item">Mobile Apps <span>✦</span></div>
+    <div class="marquee-item">Websites <span>✦</span></div>
+    <div class="marquee-item">Ticketing Systems <span>✦</span></div>
+    <div class="marquee-item">WebGL <span>✦</span></div>
+    <div class="marquee-item">Design <span>✦</span></div>
+    <div class="marquee-item">Infrastructure <span>✦</span></div>
+    <div class="marquee-item">Game Dev <span>✦</span></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About NaughtyDuk</div>
+  <h2 class="section-title">Digital consultancy<br>& design studio.</h2>
+
+  <div class="about-grid">
+    <div class="about-left">
+      <div class="big-stat">7+</div>
+      <p>Years partnering with major entertainment brands</p>
+
+      <br><br>
+
+      <div class="big-stat">50+</div>
+      <p>Global digital projects delivered</p>
+    </div>
+
+    <div class="about-right">
+      <p>We are a <strong>digital consultancy and design studio</strong> based in Manchester, UK. We design, develop and build digital systems for the entertainment industry.</p>
+      <p>Working with some of the world's biggest brands to deliver <strong>immersive and performant experiences</strong> that slap.</p>
+      <p>Major entertainment brands including <strong>Teletech, T11,</strong> and <strong>OFFLIMITS</strong> trust us as their long-term digital partner.</p>
+
+      <div class="services-list">
+        <div class="service-tag">Brand Design</div>
+        <div class="service-tag">Web Development</div>
+        <div class="service-tag">Mobile Apps</div>
+        <div class="service-tag">Ticketing Systems</div>
+        <div class="service-tag">WebGL / 3D</div>
+        <div class="service-tag">Infrastructure</div>
+        <div class="service-tag">Game Development</div>
+        <div class="service-tag">Design Systems</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK / PROJECTS -->
+<section id="work" class="projects">
+  <div class="projects-header">
+    <div>
+      <div class="section-label">Selected Work</div>
+      <h2 class="section-title">Projects</h2>
+    </div>
+    <a href="#" class="btn-ghost">View All Projects</a>
+  </div>
+
+  <div class="project-grid">
+
+    <!-- Teletech - biggest card -->
+    <div class="project-card">
+      <div class="card-visual">
+        <div class="card-bg c1">
+          <div class="card-inner-icon">
+            <span class="card-icon-text">TELETECH</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-info">
+        <div>
+          <div class="card-name">Teletech</div>
+          <div class="card-type">Design · Web · Mobile · Game Dev</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#666" stroke-width="1.5">
+            <path d="M2 12L12 2M12 2H5M12 2v7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="card-visual">
+        <div class="card-bg c2">
+          <div class="card-inner-icon">
+            <span class="card-icon-text">T11</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-info">
+        <div>
+          <div class="card-name">T11</div>
+          <div class="card-type">Web · Brand · Experience</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#666" stroke-width="1.5">
+            <path d="M2 12L12 2M12 2H5M12 2v7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="card-visual">
+        <div class="card-bg c3">
+          <div class="card-inner-icon">
+            <span class="card-icon-text">OFFLIMITS</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-info">
+        <div>
+          <div class="card-name">OFFLIMITS</div>
+          <div class="card-type">Web · Audio · Marketing</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#666" stroke-width="1.5">
+            <path d="M2 12L12 2M12 2H5M12 2v7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="card-visual">
+        <div class="card-bg c4">
+          <div class="card-inner-icon">
+            <span class="card-icon-text">INTRKT</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-info">
+        <div>
+          <div class="card-name">INTRKT</div>
+          <div class="card-type">Real-time · Interactive</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#666" stroke-width="1.5">
+            <path d="M2 12L12 2M12 2H5M12 2v7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="card-visual">
+        <div class="card-bg c5">
+          <div class="card-inner-icon">
+            <span class="card-icon-text">PRIMAL</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-info">
+        <div>
+          <div class="card-name">PRIMAL™</div>
+          <div class="card-type">Plugins · Licensing · Payment</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#666" stroke-width="1.5">
+            <path d="M2 12L12 2M12 2H5M12 2v7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="card-visual">
+        <div class="card-bg c6">
+          <div class="card-inner-icon">
+            <span class="card-icon-text">glitchGL</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-info">
+        <div>
+          <div class="card-name">glitchGL</div>
+          <div class="card-type">WebGL · Open Source</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#666" stroke-width="1.5">
+            <path d="M2 12L12 2M12 2H5M12 2v7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CAPABILITIES / SERVICES -->
+<section id="capabilities" class="capabilities">
+  <div class="section-label">What We Do</div>
+  <h2 class="section-title">Capabilities</h2>
+
+  <div class="cap-grid">
+    <div class="cap-item">
+      <div class="cap-num">01</div>
+      <div class="cap-title">Brand &<br>Design</div>
+      <p class="cap-desc">Visual identity, design systems, and digital-first brand work that stands out in a crowded entertainment landscape.</p>
+    </div>
+    <div class="cap-item">
+      <div class="cap-num">02</div>
+      <div class="cap-title">Web &<br>Mobile</div>
+      <p class="cap-desc">Highly optimised, performant websites and mobile applications. Real-time rendering engines and interactive experience platforms.</p>
+    </div>
+    <div class="cap-item">
+      <div class="cap-num">03</div>
+      <div class="cap-title">WebGL &<br>3D</div>
+      <p class="cap-desc">Immersive in-browser experiences using cutting-edge WebGL. Creators of glitchGL — the internet's most powerful browser glitch library.</p>
+    </div>
+    <div class="cap-item">
+      <div class="cap-num">04</div>
+      <div class="cap-title">Ticketing &<br>Commerce</div>
+      <p class="cap-desc">Custom ticketing systems, payment integration, and e-commerce solutions tailored to the entertainment industry's unique requirements.</p>
+    </div>
+    <div class="cap-item">
+      <div class="cap-num">05</div>
+      <div class="cap-title">Infrastructure &<br>Systems</div>
+      <p class="cap-desc">Robust back-end architecture, cloud infrastructure, and scalable systems that support global audiences without breaking a sweat.</p>
+    </div>
+    <div class="cap-item">
+      <div class="cap-num">06</div>
+      <div class="cap-title">Game<br>Development</div>
+      <p class="cap-desc">Interactive games, gamification features, and immersive play experiences that extend brand engagement beyond the screen.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients" class="clients">
+  <div class="section-label">Who We Work With</div>
+  <h2 class="section-title">Clients</h2>
+
+  <div style="margin-top: 56px;">
+    <div class="client-row">
+      <div class="client-name">Teletech</div>
+      <div class="client-meta">
+        <div class="client-tag">Entertainment</div>
+        <div class="client-tag">Design · Web · Mobile</div>
+        <div class="client-years">7+ Years</div>
+      </div>
+    </div>
+    <div class="client-row">
+      <div class="client-name">T11</div>
+      <div class="client-meta">
+        <div class="client-tag">Production</div>
+        <div class="client-tag">Brand · Web</div>
+        <div class="client-years">Ongoing</div>
+      </div>
+    </div>
+    <div class="client-row">
+      <div class="client-name">OFFLIMITS</div>
+      <div class="client-meta">
+        <div class="client-tag">Festival</div>
+        <div class="client-tag">Web · Audio</div>
+        <div class="client-years">Ongoing</div>
+      </div>
+    </div>
+    <div class="client-row">
+      <div class="client-name">INTRKT</div>
+      <div class="client-meta">
+        <div class="client-tag">Interactive</div>
+        <div class="client-tag">Platform · Engine</div>
+        <div class="client-years">Ongoing</div>
+      </div>
+    </div>
+    <div class="client-row">
+      <div class="client-name">PRIMAL™</div>
+      <div class="client-meta">
+        <div class="client-tag">Music Tech</div>
+        <div class="client-tag">Plugins · Commerce</div>
+        <div class="client-years">Partner</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / CONTACT -->
+<div id="contact" class="cta-section">
+  <div class="cta-left">
+    <h2 class="cta-title">Let's build<br>something<br>unforgettable.</h2>
+    <p>Got a project in mind? We'd love to hear from you. Drop us a message and let's make something that slaps.</p>
+  </div>
+  <a href="mailto:hello@naughtyduk.com" class="btn-dark">Start a Project →</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">Naughty<span>Duk</span>©</div>
+      <p class="footer-desc">The entertainment industry's digital partner. Design, development and digital systems from Manchester, UK.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Work</h4>
+      <ul>
+        <li><a href="#">Teletech</a></li>
+        <li><a href="#">T11</a></li>
+        <li><a href="#">OFFLIMITS</a></li>
+        <li><a href="#">INTRKT</a></li>
+        <li><a href="#">PRIMAL™</a></li>
+        <li><a href="#">glitchGL</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Studio</h4>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Capabilities</a></li>
+        <li><a href="#">Store</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="#">glitchGL</a></li>
+        <li><a href="#">WebGL Presets</a></li>
+        <li><a href="#">Design Assets</a></li>
+        <li><a href="#">Fonts</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2024 NaughtyDuk Ltd · Reg. No: 14657518 · Manchester, UK</p>
+    <p><a href="#">Privacy Policy</a> · <a href="#">Terms</a></p>
+    <p class="footer-reg">NAUGHTYDUK LTD · Registration No: 14657518</p>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor - the ring follows with a slight delay using lerp
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursor.style.transform = `translate(${mouseX - 5}px, ${mouseY - 5}px)`;
+  });
+
+  // ring animation loop
+  function animateRing() {
+    // lerp toward mouse position (0.12 = smoothing factor)
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // add blur to nav when user scrolls down
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 60) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+  });
+
+  // make cursor bigger when hovering over clickable stuff
+  const clickables = document.querySelectorAll('a, button, .project-card, .cap-item, .client-row');
+
+  clickables.forEach(function(el) {
+    el.addEventListener('mouseenter', function() {
+      ring.style.width = '50px';
+      ring.style.height = '50px';
+    });
+    el.addEventListener('mouseleave', function() {
+      ring.style.width = '32px';
+      ring.style.height = '32px';
+    });
+  });
+</script>
+
+</body>
+</html>

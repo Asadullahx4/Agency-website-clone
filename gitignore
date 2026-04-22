@@ -1,0 +1,10 @@
+# mac stuff
+.DS_Store
+
+# editor folders
+.vscode/
+.idea/
+
+# random notes I don't want pushed
+notes.txt
+scratch.html
