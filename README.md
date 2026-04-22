@@ -40,7 +40,7 @@ The project grid was originally going to be flexbox but grid with named column s
 
 ## Live Demo
 
-> *(github.com/Asadullahx4/Agency-website-clone)*
+> (github.com/Asadullahx4/Agency-website-clone)
 
 ## How to run
 
