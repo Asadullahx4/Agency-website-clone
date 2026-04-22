@@ -38,13 +38,9 @@ Also spent way too long on the glitch keyframe animation for the background DUK 
 
 The project grid was originally going to be flexbox but grid with named column spans ended up being way cleaner for the asymmetric layout.
 
-## Screenshots
-
-> *(add screenshots here)*
-
 ## Live Demo
 
-> *(deploy to GitHub Pages or Vercel and add link here)*
+> *(github.com/Asadullahx4/Agency-website-clone)*
 
 ## How to run
 
